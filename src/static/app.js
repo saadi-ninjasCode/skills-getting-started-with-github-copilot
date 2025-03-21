@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const participantsList = document.getElementById("participants-list");
 
   // Function to fetch activities from API
   async function fetchActivities() {
@@ -25,6 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <p><strong>Participants:</strong></p>
+          <ul>
+            ${details.participants.map(participant => `<li>${participant}</li>`).join('')}
+          </ul>
         `;
 
         activitiesList.appendChild(activityCard);
@@ -38,6 +43,21 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
       console.error("Error fetching activities:", error);
+    }
+  }
+
+  // Function to display participants for the selected activity
+  function displayParticipants(activity) {
+    const selectedActivity = activities[activity];
+    if (selectedActivity) {
+      participantsList.innerHTML = `
+        <h4>Participants for ${activity}</h4>
+        <ul>
+          ${selectedActivity.participants.map(participant => `<li>${participant}</li>`).join('')}
+        </ul>
+      `;
+    } else {
+      participantsList.innerHTML = "<p>No participants found for this activity.</p>";
     }
   }
 
@@ -78,6 +98,16 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.className = "error";
       messageDiv.classList.remove("hidden");
       console.error("Error signing up:", error);
+    }
+  });
+
+  // Handle activity selection change
+  activitySelect.addEventListener("change", (event) => {
+    const selectedActivity = event.target.value;
+    if (selectedActivity) {
+      displayParticipants(selectedActivity);
+    } else {
+      participantsList.innerHTML = "<p>Select an activity to see participants...</p>";
     }
   });
 
